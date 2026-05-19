@@ -1,0 +1,3689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planos de Investimento</title>
+  <meta name="description" content="Simule seus ganhos com planos de investimento, programa de gerentes e renda residual." />
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234F46E5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='19' y1='5' x2='5' y2='19'/%3E%3Ccircle cx='6.5' cy='6.5' r='2.5'/%3E%3Ccircle cx='17.5' cy='17.5' r='2.5'/%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #ffffff;
+      --bg-soft: #fafafa;
+      --bg-card: #ffffff;
+      --text: #1a1a2e;
+      --text-soft: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --border-soft: #f3f4f6;
+      --primary: #4f46e5;
+      --primary-soft: #eef2ff;
+      --primary-dark: #4338ca;
+      --success: #10b981;
+      --success-soft: #d1fae5;
+      --warning: #f59e0b;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.06), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--text);
+    }
+
+    .brand svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .brand svg {
+      color: var(--primary);
+    }
+
+    .header-meta {
+      font-size: 13px;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 80px 0 56px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 18px;
+      color: var(--text);
+    }
+
+    .hero p {
+      font-size: clamp(16px, 1.7vw, 19px);
+      color: var(--text-soft);
+      max-width: 620px;
+      margin: 0 auto;
+      line-height: 1.55;
+    }
+
+    /* How to use */
+    .how {
+      padding: 56px 0;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .step {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: all 0.2s ease;
+    }
+
+    .step:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .step-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      background: var(--primary-soft);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .step-number {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .step-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .step-desc {
+      font-size: 13.5px;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    /* Calculator */
+    .calc-section {
+      padding: 56px 0;
+      background: var(--bg-soft);
+      margin: 24px -24px 0;
+      padding-left: 24px;
+      padding-right: 24px;
+      border-radius: 0;
+    }
+
+    .calc-wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .calc {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow-md);
+    }
+
+    @media (max-width: 820px) {
+      .calc {
+        grid-template-columns: 1fr;
+        padding: 22px;
+        gap: 24px;
+      }
+    }
+
+    .calc-inputs h3,
+    .calc-result h3 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 18px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      transition: all 0.15s ease;
+    }
+
+    .input-wrap:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    }
+
+    .input-prefix {
+      padding: 12px 12px 12px 14px;
+      color: var(--text-soft);
+      font-size: 14px;
+      font-weight: 500;
+      border-right: 1px solid var(--border-soft);
+      background: var(--bg-soft);
+      border-top-left-radius: var(--radius-sm);
+      border-bottom-left-radius: var(--radius-sm);
+    }
+
+    .input-wrap input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      background: transparent;
+      color: var(--text);
+      min-width: 0;
+    }
+
+    .input-wrap select {
+      border: none;
+      outline: none;
+      padding: 0 32px 0 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+      font-weight: 500;
+      background: var(--bg-soft);
+      color: var(--text);
+      cursor: pointer;
+      border-left: 1px solid var(--border-soft);
+      border-top-right-radius: var(--radius-sm);
+      border-bottom-right-radius: var(--radius-sm);
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9' transform='translate(-3 -3)'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+
+    /* Planos */
+    .planos {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 480px) {
+      .planos { grid-template-columns: 1fr; }
+    }
+
+    .plano {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 8px;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+
+    .plano:hover {
+      border-color: var(--primary);
+    }
+
+    .plano.active {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .plano-nome {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .plano.active .plano-nome {
+      color: var(--primary);
+    }
+
+    .plano-taxa {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      font-feature-settings: 'tnum';
+      letter-spacing: -0.01em;
+      margin-top: 2px;
+    }
+
+    .plano.active .plano-taxa {
+      color: var(--primary);
+    }
+
+    .plano-period {
+      font-size: 11px;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    /* Toggle switch */
+    .field-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      margin-top: 4px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #d1d5db;
+      transition: 0.2s;
+      border-radius: 999px;
+    }
+
+    .slider::before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      transition: 0.2s;
+      border-radius: 50%;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .switch input:checked + .slider {
+      background: var(--primary);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(16px);
+    }
+
+    .switch-label {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .field.hidden {
+      display: none;
+    }
+
+    .calc-result {
+      background: linear-gradient(180deg, #f9fafb 0%, #ffffff 100%);
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .result-main {
+      text-align: center;
+      padding: 16px 0 22px;
+    }
+
+    .result-main .label {
+      font-size: 13px;
+      color: var(--text-soft);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .result-main .value {
+      font-size: clamp(34px, 5vw, 46px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--primary);
+      font-feature-settings: 'tnum';
+      transition: color 0.2s ease;
+    }
+
+    .result-breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .breakdown-item {
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+    }
+
+    .breakdown-item .label {
+      font-size: 12px;
+      color: var(--text-soft);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .breakdown-item .value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      font-feature-settings: 'tnum';
+    }
+
+    .breakdown-item.juros .value {
+      color: var(--success);
+    }
+
+    .chart-wrap {
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 14px 8px 4px;
+      margin-bottom: 18px;
+      position: relative;
+      height: 230px;
+    }
+
+    .table-toggle {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+
+    .table-toggle:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .table-toggle svg {
+      transition: transform 0.2s ease;
+    }
+
+    .table-toggle.open svg {
+      transform: rotate(180deg);
+    }
+
+    .table-wrap {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .table-wrap.open {
+      max-height: 480px;
+      overflow-y: auto;
+      margin-top: 12px;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      background: var(--bg-soft);
+      z-index: 1;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      font-weight: 600;
+      color: var(--text-soft);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th.num,
+    td.num {
+      text-align: right;
+      font-feature-settings: 'tnum';
+    }
+
+    td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border-soft);
+      color: var(--text);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: var(--bg-soft);
+    }
+
+    /* Action bar */
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      color: white;
+      border-color: var(--primary-dark);
+    }
+
+    /* Download */
+    .download {
+      padding: 56px 0 72px;
+      text-align: center;
+    }
+
+    .download-card {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 36px 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .download-card h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .download-card p {
+      color: var(--text-soft);
+      font-size: 14.5px;
+      margin-bottom: 22px;
+    }
+
+    .btn-large {
+      padding: 14px 26px;
+      font-size: 15px;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      background: var(--bg-soft);
+    }
+
+    .footer-inner {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .footer-inner p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .footer-inner p:last-child {
+      margin-bottom: 0;
+      font-weight: 500;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: white;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transition: all 0.25s ease;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Hidden file input */
+    .hidden-file {
+      display: none;
+    }
+
+    /* Seção Gerência */
+    .gerencia-section {
+      padding: 64px 0 24px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .gerencia-hero {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .gerencia-hero h2 {
+      font-size: clamp(26px, 3.5vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 14px 0 10px;
+      color: var(--text);
+    }
+
+    .gerencia-hero p {
+      font-size: 15px;
+      color: var(--text-soft);
+      max-width: 580px;
+      margin: 0 auto;
+      line-height: 1.55;
+    }
+
+    .gerencia {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .ger-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ger-card h3 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 18px;
+    }
+
+    .ger-card .planos {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 480px) {
+      .ger-card .planos { grid-template-columns: 1fr; }
+    }
+
+    .direta-row {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 18px;
+      align-items: end;
+    }
+
+    @media (max-width: 620px) {
+      .direta-row { grid-template-columns: 1fr; }
+    }
+
+    .direta-row .field {
+      margin: 0;
+    }
+
+    .resultado-inline {
+      background: var(--primary-soft);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .resultado-inline .label {
+      font-size: 12px;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    .resultado-inline .value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      font-feature-settings: 'tnum';
+      letter-spacing: -0.01em;
+    }
+
+    .niveis {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nivel-row {
+      display: grid;
+      grid-template-columns: 90px 56px 1fr 130px;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .nivel-row:last-child {
+      border-bottom: none;
+    }
+
+    .nivel-row .input-wrap {
+      width: 100%;
+    }
+
+    .nivel-row .input-wrap input {
+      padding: 9px 12px;
+      font-size: 14px;
+    }
+
+    .nivel-row .input-prefix {
+      padding: 9px 10px 9px 12px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 780px) {
+      .nivel-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 14px 0;
+      }
+      .nivel-row .nivel-label { grid-column: 1; }
+      .nivel-row .nivel-pct { grid-column: 2; justify-self: end; }
+      .nivel-row .input-wrap:first-of-type { grid-column: 1 / -1; }
+      .nivel-row .input-wrap:last-of-type { grid-column: 1 / -1; }
+      .nivel-row .nivel-sub { grid-column: 1 / -1; text-align: right; }
+    }
+
+    .nivel-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .nivel-pct {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-soft);
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    .nivel-sub {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      font-feature-settings: 'tnum';
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .total-card {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border-color: transparent;
+      color: white;
+    }
+
+    .total-card h3 {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .total-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.3fr;
+      gap: 20px;
+      align-items: end;
+    }
+
+    @media (max-width: 620px) {
+      .total-grid { grid-template-columns: 1fr; gap: 14px; }
+    }
+
+    .total-item .label {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.75);
+      margin-bottom: 4px;
+    }
+
+    .total-item .value {
+      font-size: 19px;
+      font-weight: 700;
+      font-feature-settings: 'tnum';
+      letter-spacing: -0.01em;
+    }
+
+    .total-item.big .value {
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .ger-footer {
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .ger-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ger-card-header h3 {
+      margin-bottom: 0;
+    }
+
+    .btn-zerar {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-zerar:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .btn-zerar:active {
+      transform: translateY(1px);
+    }
+
+    /* Cards de cargo (Júnior / Black) */
+    .plano-star {
+      width: 22px;
+      height: 22px;
+      margin-bottom: 4px;
+      transition: transform 0.2s ease;
+    }
+
+    .plano:hover .plano-star {
+      transform: scale(1.08) rotate(-3deg);
+    }
+
+    .plano-junior .plano-star {
+      color: #B0B7C3;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.08));
+    }
+
+    .plano-junior.active .plano-star {
+      color: #6B7280;
+    }
+
+    .plano-black {
+      background: #1E293B;
+      border-color: #334155;
+    }
+
+    .plano-black:hover {
+      border-color: #FACC15;
+      background: #273548;
+    }
+
+    .plano-black.active {
+      background: #1A2538;
+      border-color: #FACC15;
+      box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.2), 0 6px 16px -4px rgba(0, 0, 0, 0.2);
+    }
+
+    .plano-req {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-soft);
+      font-size: 10.5px;
+      color: var(--text-soft);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      width: 100%;
+      text-align: center;
+      line-height: 1.35;
+    }
+
+    .plano-black .plano-req {
+      border-top-color: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    .plano-black.active .plano-req {
+      color: rgba(253, 224, 71, 0.85);
+    }
+
+    .plano-black .plano-nome {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .plano-black.active .plano-nome {
+      color: #FACC15;
+    }
+
+    .plano-black .plano-taxa {
+      color: #ffffff;
+    }
+
+    .plano-black.active .plano-taxa {
+      color: #FACC15;
+    }
+
+    .plano-black .plano-period {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .plano-black .plano-star {
+      color: #FACC15;
+      filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.4));
+    }
+
+    .plano-black.active .plano-star {
+      color: #FDE047;
+      filter: drop-shadow(0 0 12px rgba(253, 224, 71, 0.6));
+    }
+
+    /* Seção Residual */
+    .residual-section {
+      padding: 64px 0 24px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .niveis-tabs {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 640px) {
+      .niveis-tabs { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .nivel-tab {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 6px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-soft);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .nivel-tab:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .nivel-tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 10px -2px rgba(79, 70, 229, 0.35);
+    }
+
+    .requisito-info {
+      font-size: 13.5px;
+      color: var(--text);
+      background: var(--primary-soft);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      text-align: center;
+      font-weight: 500;
+      line-height: 1.45;
+    }
+
+    .requisito-info .req-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .residual-tabela {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tab-linha {
+      display: grid;
+      grid-template-columns: 28px 80px 72px minmax(160px, 1fr) 130px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-soft);
+      transition: opacity 0.2s ease;
+    }
+
+    .tab-vol-auto {
+      font-size: 13.5px;
+      color: var(--text-soft);
+      font-feature-settings: 'tnum';
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab-vol-auto .auto-num {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .auto-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--primary);
+      background: var(--primary-soft);
+      padding: 3px 7px;
+      border-radius: 4px;
+    }
+
+    .tab-linha .input-wrap {
+      width: 100%;
+    }
+
+    .tab-linha .input-wrap input {
+      padding: 8px 12px;
+      font-size: 13.5px;
+    }
+
+    .tab-linha .input-prefix {
+      padding: 8px 10px 8px 12px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 760px) {
+      .tab-linha {
+        grid-template-columns: 28px 1fr auto;
+        gap: 8px 12px;
+        grid-template-areas:
+          "icone nivel pct"
+          "icone vol vol"
+          "icone valor valor";
+        padding: 14px 0;
+      }
+      .tab-icone { grid-area: icone; align-self: start; margin-top: 2px; }
+      .tab-nivel { grid-area: nivel; }
+      .tab-pct { grid-area: pct; justify-self: end; }
+      .tab-vol-auto,
+      .tab-linha .input-wrap { grid-area: vol; }
+      .tab-valor { grid-area: valor; }
+    }
+
+    .tab-linha:last-child {
+      border-bottom: none;
+    }
+
+    .tab-icone {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #D1FAE5;
+      color: #059669;
+    }
+
+    .tab-icone svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .tab-nivel {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .tab-pct {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-soft);
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-align: center;
+      letter-spacing: 0.01em;
+      justify-self: start;
+    }
+
+    .tab-valor {
+      font-size: 15px;
+      font-weight: 700;
+      font-feature-settings: 'tnum';
+      text-align: right;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .tab-linha.bloq {
+      opacity: 0.45;
+    }
+
+    .tab-linha.bloq .tab-icone {
+      background: var(--border-soft);
+      color: var(--text-muted);
+    }
+
+    .tab-linha.bloq .tab-pct {
+      background: var(--border-soft);
+      color: var(--text-muted);
+    }
+
+    .residual-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 0 4px;
+      margin-top: 8px;
+      border-top: 2px solid var(--border);
+    }
+
+    .residual-total .label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+
+    .residual-total .value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      font-feature-settings: 'tnum';
+      letter-spacing: -0.02em;
+    }
+
+    /* Tabs principais */
+    .tabs-nav {
+      position: sticky;
+      top: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      z-index: 50;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tabs-nav-inner {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      padding: 0;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tabs-nav-inner::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      flex: 1 1 0;
+      min-width: 130px;
+      background: transparent;
+      border: none;
+      border-right: 1px solid var(--border-soft);
+      padding: 0 12px;
+      height: 72px;
+      border-radius: 0;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-soft);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn:last-child {
+      border-right: none;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background: var(--bg-soft);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: inset 0 -3px 0 var(--primary-dark);
+    }
+
+    .tab-btn.active:hover {
+      background: var(--primary-dark);
+      color: white;
+    }
+
+    .tab-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .tab-help {
+      flex: 0 0 auto;
+      min-width: 120px;
+    }
+
+    .calc-tab {
+      display: none;
+    }
+
+    .calc-tab.active {
+      display: block;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* Modal Como Usar */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal {
+      background: white;
+      border-radius: var(--radius);
+      max-width: 640px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: white;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .modal-close {
+      background: var(--bg-soft);
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-soft);
+      transition: all 0.15s ease;
+    }
+
+    .modal-close:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-section {
+      margin-bottom: 22px;
+    }
+
+    .modal-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .modal-section h3 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-section h3 .step-num {
+      background: var(--primary-soft);
+      color: var(--primary);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .modal-section p,
+    .modal-section ul {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .modal-section ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .modal-section li {
+      padding: 4px 0 4px 18px;
+      position: relative;
+    }
+
+    .modal-section li::before {
+      content: "•";
+      color: var(--primary);
+      position: absolute;
+      left: 4px;
+      font-weight: 700;
+    }
+
+    /* Seção Geral */
+    .geral-section {
+      padding: 56px 0 24px;
+    }
+
+    .geral-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 760px) {
+      .geral-cards { grid-template-columns: 1fr; }
+    }
+
+    .geral-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .geral-stat .label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 8px;
+    }
+
+    .geral-stat .value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      font-feature-settings: 'tnum';
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .geral-stat .sub {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .geral-stat.highlight {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border-color: transparent;
+      color: white;
+    }
+
+    .geral-stat.highlight .label {
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .geral-stat.highlight .value {
+      color: white;
+      font-size: 30px;
+    }
+
+    .geral-stat.highlight .sub {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .geral-charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 760px) {
+      .geral-charts { grid-template-columns: 1fr; }
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chart-card h3 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 18px;
+    }
+
+    .chart-card-canvas {
+      position: relative;
+      height: 240px;
+    }
+
+    .geral-totalcard {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .geral-totalcard .label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 6px;
+    }
+
+    .geral-totalcard .value {
+      font-size: clamp(34px, 5vw, 48px);
+      font-weight: 800;
+      font-feature-settings: 'tnum';
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+    }
+
+    .geral-totalcard .sub {
+      font-size: 13.5px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 8px;
+    }
+
+    /* Múltiplos planos */
+    .add-plano-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 24px 0;
+    }
+
+    .btn-add-plano {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      border: 2px dashed var(--primary);
+      color: var(--primary);
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-add-plano:hover {
+      background: var(--primary-soft);
+      transform: translateY(-1px);
+    }
+
+    .btn-add-plano:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-add-plano svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .plano-extra {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-top: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .plano-extra-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .plano-extra-header h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.02em;
+    }
+
+    .btn-remover-plano {
+      background: var(--bg-soft);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-soft);
+      transition: all 0.15s ease;
+    }
+
+    .btn-remover-plano:hover {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+
+    .plano-extra-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .plano-extra-grid { grid-template-columns: 1fr; }
+    }
+
+    .plano-extra-result {
+      background: linear-gradient(180deg, #f9fafb 0%, #ffffff 100%);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .plano-extra-result .res-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .plano-extra-result .res-final {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+      font-feature-settings: 'tnum';
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .plano-extra-result .res-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-soft);
+      padding: 6px 0;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .plano-extra-result .res-line:first-of-type {
+      border-top: none;
+    }
+
+    .plano-extra-result .res-line strong {
+      color: var(--text);
+      font-weight: 700;
+      font-feature-settings: 'tnum';
+    }
+
+    .plano-extra .plano:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      filter: grayscale(0.5);
+    }
+
+    .plano-extra .plano:disabled:hover {
+      border-color: var(--border);
+      transform: none;
+      background: var(--bg);
+    }
+
+    .planos-somatorio {
+      background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+      color: white;
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-top: 16px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .planos-somatorio h3 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.75);
+      margin-bottom: 16px;
+    }
+
+    .planos-somatorio-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.3fr;
+      gap: 18px;
+      align-items: end;
+    }
+
+    @media (max-width: 600px) {
+      .planos-somatorio-grid { grid-template-columns: 1fr; gap: 12px; }
+    }
+
+    .planos-somatorio-item .label {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.75);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .planos-somatorio-item .value {
+      font-size: 19px;
+      font-weight: 700;
+      font-feature-settings: 'tnum';
+      letter-spacing: -0.01em;
+    }
+
+    .planos-somatorio-item.big .value {
+      font-size: 30px;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="19" y1="5" x2="5" y2="19"></line>
+          <circle cx="6.5" cy="6.5" r="2.5"></circle>
+          <circle cx="17.5" cy="17.5" r="2.5"></circle>
+        </svg>
+        <span>Juros Compostos</span>
+      </div>
+      <div class="header-meta">Educacional · Gratuito</div>
+    </div>
+  </header>
+
+  <nav class="tabs-nav" aria-label="Calculadoras">
+    <div class="tabs-nav-inner">
+      <button class="tab-btn active" data-tab="geral" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        Geral
+      </button>
+      <button class="tab-btn" data-tab="juros" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="19" y1="5" x2="5" y2="19"></line><circle cx="6.5" cy="6.5" r="2.5"></circle><circle cx="17.5" cy="17.5" r="2.5"></circle>
+        </svg>
+        Planos de Investimento
+      </button>
+      <button class="tab-btn" data-tab="gerencia" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87"></path><path d="M16 3.13a4 4 0 010 7.75"></path>
+        </svg>
+        Gerência
+      </button>
+      <button class="tab-btn" data-tab="residual" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path>
+        </svg>
+        Residual
+      </button>
+      <button class="tab-btn tab-help" id="btn-como-usar" type="button" aria-label="Como usar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Como usar
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="calc-tab" id="tab-juros">
+    <section class="hero container">
+      <span class="hero-eyebrow">Simulador</span>
+      <h1>Calculadora de Juros Compostos</h1>
+      <p>Escolha entre Iniciante, Intermediário ou Avançado e veja a evolução do seu capital com juros compostos.</p>
+    </section>
+
+    <section class="how container">
+      <div class="section-title">Como utilizar</div>
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"></path>
+            </svg>
+          </div>
+          <div class="step-number">PASSO 1</div>
+          <div class="step-title">Valor inicial</div>
+          <div class="step-desc">Informe o valor que você já tem investido hoje.</div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <div class="step-number">PASSO 2</div>
+          <div class="step-title">Aporte mensal (opcional)</div>
+          <div class="step-desc">Adicione um valor mensal ou mantenha desligado.</div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+          </div>
+          <div class="step-number">PASSO 3</div>
+          <div class="step-title">Escolha o plano</div>
+          <div class="step-desc">Selecione Iniciante, Intermediário ou Avançado.</div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+          <div class="step-number">PASSO 4</div>
+          <div class="step-title">Veja o resultado</div>
+          <div class="step-desc">Acompanhe gráfico e tabela mês a mês em tempo real.</div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="calc-section">
+      <div class="calc-wrapper container">
+        <div class="calc" data-plano-id="1">
+
+          <div class="calc-inputs">
+            <h3>Parâmetros</h3>
+
+            <div class="field">
+              <label for="valor-inicial">Valor inicial</label>
+              <div class="input-wrap">
+                <span class="input-prefix">R$</span>
+                <input type="text" id="valor-inicial" inputmode="decimal" value="1.000,00" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Plano de investimento</label>
+              <div class="planos" role="radiogroup" aria-label="Plano de investimento">
+                <button type="button" class="plano active" data-plano="iniciante" role="radio" aria-checked="true">
+                  <span class="plano-nome">Iniciante</span>
+                  <span class="plano-taxa">27%</span>
+                  <span class="plano-period">ao mês</span>
+                </button>
+                <button type="button" class="plano" data-plano="intermediario" role="radio" aria-checked="false">
+                  <span class="plano-nome">Intermediário</span>
+                  <span class="plano-taxa">30%</span>
+                  <span class="plano-period">ao mês</span>
+                </button>
+                <button type="button" class="plano" data-plano="avancado" role="radio" aria-checked="false">
+                  <span class="plano-nome">Avançado</span>
+                  <span class="plano-taxa">33%</span>
+                  <span class="plano-period">ao mês</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="field-toggle">
+              <label class="switch" for="aporte-toggle">
+                <input type="checkbox" id="aporte-toggle" checked />
+                <span class="slider"></span>
+              </label>
+              <label class="switch-label" for="aporte-toggle">Fazer aporte mensal</label>
+            </div>
+
+            <div class="field" id="aporte-field">
+              <label for="aporte">Aporte mensal</label>
+              <div class="input-wrap">
+                <span class="input-prefix">R$</span>
+                <input type="text" id="aporte" inputmode="decimal" value="300,00" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="tempo">Período</label>
+              <div class="input-wrap">
+                <input type="text" id="tempo" inputmode="numeric" value="6" />
+                <select id="tempo-unidade" aria-label="Unidade do período">
+                  <option value="meses" selected>meses</option>
+                  <option value="anos">anos</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn" id="btn-salvar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                Salvar simulação
+              </button>
+              <button class="btn" id="btn-abrir">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"></path>
+                </svg>
+                Abrir simulação
+              </button>
+              <input type="file" id="file-input" class="hidden-file" accept=".json,application/json" />
+            </div>
+          </div>
+
+          <div class="calc-result">
+            <h3>Resultado</h3>
+
+            <div class="result-main">
+              <div class="label">Valor final estimado</div>
+              <div class="value" id="result-final">R$ 0,00</div>
+            </div>
+
+            <div class="result-breakdown">
+              <div class="breakdown-item">
+                <div class="label">Total investido</div>
+                <div class="value" id="result-investido">R$ 0,00</div>
+              </div>
+              <div class="breakdown-item juros">
+                <div class="label">Total em juros</div>
+                <div class="value" id="result-juros">R$ 0,00</div>
+              </div>
+            </div>
+
+            <div class="chart-wrap">
+              <canvas id="chart"></canvas>
+            </div>
+
+            <button class="table-toggle" id="table-toggle" aria-expanded="false">
+              <span>Ver tabela mês a mês</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+
+            <div class="table-wrap" id="table-wrap" aria-hidden="true">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Mês</th>
+                    <th class="num">Aporte</th>
+                    <th class="num">Juros</th>
+                    <th class="num">Saldo</th>
+                  </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="planos-extras" id="planos-extras"></div>
+
+        <div class="add-plano-wrap">
+          <button type="button" class="btn-add-plano" id="btn-add-plano">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Adicionar outro plano
+          </button>
+        </div>
+
+        <div class="planos-somatorio" id="planos-somatorio" hidden>
+          <h3>Somatório dos planos</h3>
+          <div class="planos-somatorio-grid">
+            <div class="planos-somatorio-item">
+              <div class="label">Total investido</div>
+              <div class="value" id="soma-investido">R$ 0,00</div>
+            </div>
+            <div class="planos-somatorio-item">
+              <div class="label">Total em juros</div>
+              <div class="value" id="soma-juros">R$ 0,00</div>
+            </div>
+            <div class="planos-somatorio-item big">
+              <div class="label">Valor final somado</div>
+              <div class="value" id="soma-final">R$ 0,00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    </div><!-- /tab-juros -->
+
+    <div class="calc-tab" id="tab-gerencia">
+    <section class="gerencia-section">
+      <div class="container">
+        <div class="gerencia-hero">
+          <span class="hero-eyebrow">Programa de gerentes</span>
+          <h2>Simulador de ganhos como gerente</h2>
+          <p>Calcule seus ganhos como Gerente Júnior ou Black, incluindo a comissão direta e a rede de indicações até o 5º nível.</p>
+        </div>
+
+        <div class="gerencia">
+
+          <div class="ger-card">
+            <h3>Seu cargo</h3>
+            <div class="planos" role="radiogroup" aria-label="Cargo de gerência">
+              <button type="button" class="plano plano-junior active" data-cargo="junior" role="radio" aria-checked="true">
+                <svg class="plano-star" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                <span class="plano-nome">Júnior</span>
+                <span class="plano-taxa">7%</span>
+                <span class="plano-period">sobre contratos diretos</span>
+                <span class="plano-req">Requer aprovação no programa<br>e primeiro contrato ativo</span>
+              </button>
+              <button type="button" class="plano plano-black" data-cargo="black" role="radio" aria-checked="false">
+                <svg class="plano-star" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                <span class="plano-nome">Black</span>
+                <span class="plano-taxa">9%</span>
+                <span class="plano-period">sobre contratos diretos</span>
+                <span class="plano-req">Requer R$ 20.000<br>em contratos ativos</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="ger-card">
+            <div class="ger-card-header">
+              <h3>Ganhos como gerente</h3>
+              <button type="button" class="btn-zerar" id="btn-zerar-ger">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <path d="M3.51 15a9 9 0 102.13-9.36L1 10"></path>
+                </svg>
+                Zerar valores
+              </button>
+            </div>
+            <div class="direta-row">
+              <div class="field">
+                <label for="volume-direto">Volume de contratos diretos (R$)</label>
+                <div class="input-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input type="text" id="volume-direto" inputmode="decimal" value="20.000,00" />
+                </div>
+              </div>
+              <div class="resultado-inline">
+                <span class="label">Você ganha</span>
+                <span class="value" id="comissao-direta">R$ 0,00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ger-card">
+            <h3>Rede de gerentes — comissão indireta</h3>
+            <div class="niveis">
+              <div class="nivel-row" data-nivel="2">
+                <span class="nivel-label">2º nível</span>
+                <span class="nivel-pct">3%</span>
+                <div class="input-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input type="text" inputmode="decimal" data-vol="2" placeholder="Valor total em contratos" value="30.000,00" aria-label="Valor total de contratos no 2º nível" />
+                </div>
+                <span class="nivel-sub" data-sub="2">R$ 0,00</span>
+              </div>
+
+              <div class="nivel-row" data-nivel="3">
+                <span class="nivel-label">3º nível</span>
+                <span class="nivel-pct">2%</span>
+                <div class="input-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input type="text" inputmode="decimal" data-vol="3" placeholder="Valor total em contratos" value="30.000,00" aria-label="Valor total de contratos no 3º nível" />
+                </div>
+                <span class="nivel-sub" data-sub="3">R$ 0,00</span>
+              </div>
+
+              <div class="nivel-row" data-nivel="4">
+                <span class="nivel-label">4º nível</span>
+                <span class="nivel-pct">2%</span>
+                <div class="input-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input type="text" inputmode="decimal" data-vol="4" placeholder="Valor total em contratos" value="30.000,00" aria-label="Valor total de contratos no 4º nível" />
+                </div>
+                <span class="nivel-sub" data-sub="4">R$ 0,00</span>
+              </div>
+
+              <div class="nivel-row" data-nivel="5">
+                <span class="nivel-label">5º nível</span>
+                <span class="nivel-pct">1,5%</span>
+                <div class="input-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input type="text" inputmode="decimal" data-vol="5" placeholder="Valor total em contratos" value="30.000,00" aria-label="Valor total de contratos no 5º nível" />
+                </div>
+                <span class="nivel-sub" data-sub="5">R$ 0,00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ger-card total-card">
+            <h3>Total estimado</h3>
+            <div class="total-grid">
+              <div class="total-item">
+                <div class="label">Comissão direta</div>
+                <div class="value" id="total-direta">R$ 0,00</div>
+              </div>
+              <div class="total-item">
+                <div class="label">Comissão indireta</div>
+                <div class="value" id="total-indireta">R$ 0,00</div>
+              </div>
+              <div class="total-item big">
+                <div class="label">Total</div>
+                <div class="value" id="total-geral">R$ 0,00</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ger-footer">
+            Pagamento da comissão: toda sexta-feira.
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    </div><!-- /tab-gerencia -->
+
+    <div class="calc-tab" id="tab-residual">
+    <section class="residual-section">
+      <div class="container">
+        <div class="gerencia-hero">
+          <span class="hero-eyebrow">Renda residual</span>
+          <h2>Simulador de renda residual</h2>
+          <p>9% do lucro da empresa distribuído em 10 níveis de profundidade. Enquanto sua rede estiver ativa, você recebe.</p>
+        </div>
+
+        <div class="gerencia">
+
+          <div class="ger-card">
+            <h3>Volume por nível</h3>
+            <p style="font-size: 13px; color: var(--text-soft); margin-bottom: 18px; line-height: 1.5;">Níveis 1 a 5 sincronizam automaticamente com a calculadora de gerência. Níveis 6 a 10 você preenche manualmente.</p>
+            <div class="residual-tabela" id="residual-tabela"></div>
+            <div class="residual-total">
+              <span class="label">Total da renda residual</span>
+              <span class="value" id="residual-acumulado">R$ 0,00</span>
+            </div>
+          </div>
+
+          <div class="ger-footer">
+            Construa. Ative. Receba.
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    </div><!-- /tab-residual -->
+
+    <div class="calc-tab active" id="tab-geral">
+      <section class="geral-section">
+        <div class="container">
+          <div class="gerencia-hero">
+            <span class="hero-eyebrow">Visão consolidada</span>
+            <h2>Resumo geral</h2>
+            <p>Somatório das três calculadoras: rendimento de juros + comissão de gerência + renda residual.</p>
+          </div>
+
+          <div class="geral-totalcard">
+            <div class="label">Total acumulado no período</div>
+            <div class="value" id="geral-total">R$ 0,00</div>
+            <div class="sub" id="geral-total-sub">Investimento final + (renda mensal × meses)</div>
+          </div>
+
+          <div class="geral-cards">
+            <div class="geral-stat">
+              <div class="label">Planos de investimento</div>
+              <div class="value" id="geral-juros">R$ 0,00</div>
+              <div class="sub">Valor final ao término do período</div>
+            </div>
+            <div class="geral-stat">
+              <div class="label">Comissão gerência</div>
+              <div class="value" id="geral-gerencia">R$ 0,00</div>
+              <div class="sub">Por período de saque</div>
+            </div>
+            <div class="geral-stat">
+              <div class="label">Renda residual</div>
+              <div class="value" id="geral-residual">R$ 0,00</div>
+              <div class="sub">Soma dos 10 níveis</div>
+            </div>
+          </div>
+
+          <div class="geral-charts">
+            <div class="chart-card">
+              <h3>Composição dos ganhos</h3>
+              <div class="chart-card-canvas">
+                <canvas id="chart-composicao"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3>Evolução ao longo do tempo</h3>
+              <div class="chart-card-canvas">
+                <canvas id="chart-evolucao"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div><!-- /tab-geral -->
+
+    <section class="download container">
+      <div class="download-card">
+        <h2>Prefere usar offline?</h2>
+        <p>Baixe a calculadora pro seu computador. Funciona em qualquer navegador, sem internet.</p>
+        <button class="btn btn-primary btn-large" id="btn-download">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Baixar calculadora
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <p>Esta calculadora tem finalidade exclusivamente educacional. As simulações apresentadas não constituem oferta, recomendação ou garantia de investimento. Resultados passados não garantem resultados futuros.</p>
+      <p>© 2026 · Planos de Investimento</p>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="modal-como-usar" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-titulo">Como usar esta calculadora</h2>
+        <button class="modal-close" id="modal-fechar" aria-label="Fechar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <div class="modal-section">
+          <h3><span class="step-num">1</span> Planos de Investimento</h3>
+          <ul>
+            <li>Escolha seu plano: <strong>Iniciante (27%)</strong>, <strong>Intermediário (30%)</strong> ou <strong>Avançado (33%)</strong> ao mês</li>
+            <li>Informe o valor inicial investido</li>
+            <li>Liga ou desliga o <strong>aporte mensal</strong> (opcional)</li>
+            <li>Defina o período em meses ou anos</li>
+            <li>Veja gráfico e tabela mês a mês com a evolução</li>
+            <li>Pode salvar a simulação como arquivo pra reabrir depois</li>
+          </ul>
+        </div>
+
+        <div class="modal-section">
+          <h3><span class="step-num">2</span> Gerência</h3>
+          <ul>
+            <li>Escolha o cargo: <strong>Júnior</strong> (7% sobre diretos) ou <strong>Black</strong> (9% — requer R$ 20.000 em contratos)</li>
+            <li>Informe o volume de contratos que você traz <strong>diretamente</strong></li>
+            <li>Pra cada nível da sua rede (2º ao 5º), informe quantos gerentes você tem e o volume médio de cada um</li>
+            <li>Vê na hora sua comissão direta + indireta + total</li>
+            <li>Pode zerar tudo no botão no canto direito</li>
+          </ul>
+        </div>
+
+        <div class="modal-section">
+          <h3><span class="step-num">3</span> Residual</h3>
+          <ul>
+            <li>9% do volume da sua rede distribuído em <strong>10 níveis de profundidade</strong></li>
+            <li>Os <strong>níveis 1 a 5</strong> puxam automaticamente da calculadora de Gerência (mexeu lá, atualiza aqui)</li>
+            <li>Os <strong>níveis 6 a 10</strong> você preenche manualmente — volume total dos contratos ativos em cada nível</li>
+            <li>A soma final é sua renda residual recorrente</li>
+          </ul>
+        </div>
+
+        <div class="modal-section">
+          <h3><span class="step-num">4</span> Geral</h3>
+          <ul>
+            <li>Soma <strong>juros + gerência + residual</strong> em um único painel</li>
+            <li>Mostra a contribuição de cada fonte</li>
+            <li>Gráfico de composição e de evolução ao longo do tempo</li>
+            <li>Total geral acumulado no período definido na calculadora de juros</li>
+          </ul>
+        </div>
+
+        <div class="modal-section">
+          <h3><span class="step-num">5</span> Offline</h3>
+          <p>No rodapé tem o botão <strong>"Baixar calculadora"</strong> — salva o HTML pro seu computador e funciona sem internet. Pode mandar pro WhatsApp também.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    'use strict';
+
+    const STORAGE_KEY = 'jc-calc-v3';
+
+    const PLANOS = {
+      iniciante: 0.27,
+      intermediario: 0.30,
+      avancado: 0.33,
+    };
+
+    let planoAtivo = 'iniciante';
+
+    const els = {
+      valorInicial: document.getElementById('valor-inicial'),
+      aporte: document.getElementById('aporte'),
+      aporteToggle: document.getElementById('aporte-toggle'),
+      aporteField: document.getElementById('aporte-field'),
+      planos: document.querySelectorAll('.plano'),
+      tempo: document.getElementById('tempo'),
+      tempoUnidade: document.getElementById('tempo-unidade'),
+      resultFinal: document.getElementById('result-final'),
+      resultInvestido: document.getElementById('result-investido'),
+      resultJuros: document.getElementById('result-juros'),
+      tableBody: document.getElementById('table-body'),
+      tableToggle: document.getElementById('table-toggle'),
+      tableWrap: document.getElementById('table-wrap'),
+      btnSalvar: document.getElementById('btn-salvar'),
+      btnAbrir: document.getElementById('btn-abrir'),
+      btnDownload: document.getElementById('btn-download'),
+      fileInput: document.getElementById('file-input'),
+      toast: document.getElementById('toast'),
+      chartCanvas: document.getElementById('chart'),
+    };
+
+    const fmtMoeda = (v) =>
+      'R$ ' + (Number(v) || 0).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+    function parseNumero(str) {
+      if (typeof str !== 'string') str = String(str);
+      const limpo = str.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+      const n = parseFloat(limpo);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function maskMoeda(input) {
+      const apenasDigitos = input.value.replace(/\D/g, '');
+      if (apenasDigitos === '') {
+        input.value = '';
+        return;
+      }
+      const numero = parseInt(apenasDigitos, 10) / 100;
+      input.value = numero.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    }
+
+    function maskDecimal(input) {
+      let v = input.value.replace(/[^\d,]/g, '');
+      const partes = v.split(',');
+      if (partes.length > 2) v = partes[0] + ',' + partes.slice(1).join('');
+      if (partes[1] && partes[1].length > 2) {
+        v = partes[0] + ',' + partes[1].substring(0, 2);
+      }
+      input.value = v;
+    }
+
+    function maskInteiro(input) {
+      input.value = input.value.replace(/\D/g, '');
+    }
+
+    function calcular() {
+      const valorInicial = parseNumero(els.valorInicial.value);
+      const aporteAtivo = els.aporteToggle.checked;
+      const aporte = aporteAtivo ? parseNumero(els.aporte.value) : 0;
+      const tempo = parseNumero(els.tempo.value);
+      const tempoUnidade = els.tempoUnidade.value;
+
+      const tempoMeses = tempoUnidade === 'anos' ? Math.round(tempo * 12) : Math.round(tempo);
+      const taxaMensal = PLANOS[planoAtivo];
+
+      let saldo = valorInicial;
+      const linhas = [];
+      let totalJurosAcum = 0;
+
+      for (let mes = 1; mes <= tempoMeses; mes++) {
+        const jurosMes = saldo * taxaMensal;
+        saldo = saldo + jurosMes + aporte;
+        totalJurosAcum += jurosMes;
+        linhas.push({
+          mes,
+          aporte: mes === 1 ? aporte + valorInicial : aporte,
+          juros: jurosMes,
+          saldo,
+        });
+      }
+
+      const totalInvestido = valorInicial + aporte * tempoMeses;
+      const valorFinal = saldo;
+      const totalJuros = valorFinal - totalInvestido;
+
+      return {
+        valorInicial,
+        aporte,
+        aporteAtivo,
+        plano: planoAtivo,
+        taxaMensal,
+        tempo,
+        tempoUnidade,
+        tempoMeses,
+        totalInvestido,
+        valorFinal,
+        totalJuros,
+        linhas,
+      };
+    }
+
+    let chartInstance = null;
+
+    function renderChart(linhas, valorInicial) {
+      const labels = ['0', ...linhas.map((l) => String(l.mes))];
+      const dataSaldo = [valorInicial, ...linhas.map((l) => l.saldo)];
+
+      const dataInvestido = [valorInicial];
+      let acumInv = valorInicial;
+      linhas.forEach((l) => {
+        acumInv += l.mes === 1 ? l.aporte - valorInicial : l.aporte;
+        dataInvestido.push(acumInv);
+      });
+
+      if (chartInstance) {
+        chartInstance.data.labels = labels;
+        chartInstance.data.datasets[0].data = dataSaldo;
+        chartInstance.data.datasets[1].data = dataInvestido;
+        chartInstance.update('none');
+        return;
+      }
+
+      const ctx = els.chartCanvas.getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Saldo total',
+              data: dataSaldo,
+              borderColor: '#4F46E5',
+              backgroundColor: 'rgba(79, 70, 229, 0.08)',
+              borderWidth: 2.5,
+              fill: true,
+              tension: 0.25,
+              pointRadius: 0,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: '#4F46E5',
+              pointHoverBorderColor: '#ffffff',
+              pointHoverBorderWidth: 2,
+            },
+            {
+              label: 'Total investido',
+              data: dataInvestido,
+              borderColor: '#10B981',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderDash: [6, 5],
+              fill: false,
+              tension: 0,
+              pointRadius: 0,
+              pointHoverRadius: 4,
+              pointHoverBackgroundColor: '#10B981',
+              pointHoverBorderColor: '#ffffff',
+              pointHoverBorderWidth: 2,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              align: 'end',
+              labels: {
+                boxWidth: 10,
+                boxHeight: 10,
+                usePointStyle: true,
+                pointStyle: 'circle',
+                font: { size: 11.5, family: 'Inter' },
+                color: '#6b7280',
+              },
+            },
+            tooltip: {
+              backgroundColor: '#1A1A2E',
+              padding: 10,
+              titleFont: { size: 12, weight: '600', family: 'Inter' },
+              bodyFont: { size: 12.5, family: 'Inter' },
+              cornerRadius: 6,
+              displayColors: true,
+              callbacks: {
+                title: (items) => 'Mês ' + items[0].label,
+                label: (item) => item.dataset.label + ': ' + fmtMoeda(item.parsed.y),
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: '#9CA3AF',
+                font: { size: 10.5, family: 'Inter' },
+                maxRotation: 0,
+                autoSkipPadding: 16,
+              },
+            },
+            y: {
+              grid: { color: '#F3F4F6', drawBorder: false },
+              ticks: {
+                color: '#9CA3AF',
+                font: { size: 10.5, family: 'Inter' },
+                callback: (v) => {
+                  if (v >= 1000000) return 'R$ ' + (v / 1000000).toFixed(1) + 'M';
+                  if (v >= 1000) return 'R$ ' + (v / 1000).toFixed(0) + 'k';
+                  return 'R$ ' + v;
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+
+    function renderTabela(linhas) {
+      const frag = document.createDocumentFragment();
+      linhas.forEach((l) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + l.mes + '</td>' +
+          '<td class="num">' + fmtMoeda(l.aporte) + '</td>' +
+          '<td class="num">' + fmtMoeda(l.juros) + '</td>' +
+          '<td class="num">' + fmtMoeda(l.saldo) + '</td>';
+        frag.appendChild(tr);
+      });
+      els.tableBody.innerHTML = '';
+      els.tableBody.appendChild(frag);
+    }
+
+    function atualizar() {
+      const r = calcular();
+      els.resultFinal.textContent = fmtMoeda(r.valorFinal);
+      els.resultInvestido.textContent = fmtMoeda(r.totalInvestido);
+      els.resultJuros.textContent = fmtMoeda(r.totalJuros);
+      renderChart(r.linhas, r.valorInicial);
+      renderTabela(r.linhas);
+      salvarLocal();
+      if (typeof recalcularSomatorio === 'function') recalcularSomatorio();
+      if (typeof atualizarGeral === 'function') atualizarGeral();
+    }
+
+    function salvarLocal() {
+      try {
+        const dados = {
+          valorInicial: els.valorInicial.value,
+          aporte: els.aporte.value,
+          aporteAtivo: els.aporteToggle.checked,
+          plano: planoAtivo,
+          tempo: els.tempo.value,
+          tempoUnidade: els.tempoUnidade.value,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+      } catch (_) { /* ignora se localStorage bloqueado */ }
+    }
+
+    function aplicarDados(d) {
+      if (d.valorInicial != null) els.valorInicial.value = d.valorInicial;
+      if (d.aporte != null) els.aporte.value = d.aporte;
+      if (d.aporteAtivo != null) {
+        els.aporteToggle.checked = !!d.aporteAtivo;
+        els.aporteField.classList.toggle('hidden', !els.aporteToggle.checked);
+      }
+      if (d.plano != null && PLANOS[d.plano] != null) {
+        planoAtivo = d.plano;
+        els.planos.forEach((b) => {
+          const ativo = b.dataset.plano === planoAtivo;
+          b.classList.toggle('active', ativo);
+          b.setAttribute('aria-checked', String(ativo));
+        });
+      }
+      if (d.tempo != null) els.tempo.value = d.tempo;
+      if (d.tempoUnidade != null) els.tempoUnidade.value = d.tempoUnidade;
+    }
+
+    function carregarLocal() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        aplicarDados(JSON.parse(raw));
+      } catch (_) {}
+    }
+
+    function toast(msg) {
+      els.toast.textContent = msg;
+      els.toast.classList.add('show');
+      setTimeout(() => els.toast.classList.remove('show'), 2000);
+    }
+
+    function downloadJSON() {
+      const dados = {
+        version: 2,
+        savedAt: new Date().toISOString(),
+        valorInicial: els.valorInicial.value,
+        aporte: els.aporte.value,
+        aporteAtivo: els.aporteToggle.checked,
+        plano: planoAtivo,
+        tempo: els.tempo.value,
+        tempoUnidade: els.tempoUnidade.value,
+      };
+      const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'simulacao-juros-compostos.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('Simulação salva no seu computador');
+    }
+
+    function abrirJSON(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          aplicarDados(JSON.parse(e.target.result));
+          atualizar();
+          toast('Simulação carregada');
+        } catch (_) {
+          toast('Arquivo inválido');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function downloadHTML() {
+      const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'calculadora-juros-compostos.html';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('Calculadora baixada — abra o arquivo no navegador');
+    }
+
+    /* Event listeners */
+    [els.valorInicial, els.aporte].forEach((inp) => {
+      inp.addEventListener('input', () => {
+        maskMoeda(inp);
+        atualizar();
+      });
+    });
+
+    els.tempo.addEventListener('input', () => {
+      maskInteiro(els.tempo);
+      atualizar();
+    });
+
+    els.tempoUnidade.addEventListener('change', atualizar);
+
+    els.planos.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        const novo = btn.dataset.plano;
+        if (!PLANOS[novo]) return;
+        planoAtivo = novo;
+        els.planos.forEach((b) => {
+          const ativo = b.dataset.plano === planoAtivo;
+          b.classList.toggle('active', ativo);
+          b.setAttribute('aria-checked', String(ativo));
+        });
+        atualizar();
+        if (typeof renderPlanosExtras === 'function') renderPlanosExtras();
+      });
+    });
+
+    els.aporteToggle.addEventListener('change', () => {
+      els.aporteField.classList.toggle('hidden', !els.aporteToggle.checked);
+      atualizar();
+    });
+
+    els.tableToggle.addEventListener('click', () => {
+      const isOpen = els.tableWrap.classList.toggle('open');
+      els.tableToggle.classList.toggle('open', isOpen);
+      els.tableToggle.setAttribute('aria-expanded', String(isOpen));
+      els.tableWrap.setAttribute('aria-hidden', String(!isOpen));
+      els.tableToggle.querySelector('span').textContent = isOpen
+        ? 'Ocultar tabela mês a mês'
+        : 'Ver tabela mês a mês';
+    });
+
+    els.btnSalvar.addEventListener('click', downloadJSON);
+    els.btnAbrir.addEventListener('click', () => els.fileInput.click());
+    els.fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) abrirJSON(e.target.files[0]);
+      e.target.value = '';
+    });
+    els.btnDownload.addEventListener('click', downloadHTML);
+
+    /* ─── Simulador de gerência ─── */
+    const GER_STORAGE_KEY = 'jc-ger-v4';
+
+    const GER_DEFAULTS = {
+      cargo: 'junior',
+      volumeDireto: '20.000,00',
+      niveis: [
+        { nivel: 2, vol: '30.000,00' },
+        { nivel: 3, vol: '30.000,00' },
+        { nivel: 4, vol: '30.000,00' },
+        { nivel: 5, vol: '30.000,00' },
+      ],
+    };
+
+    const GER_ZEROS = {
+      cargo: 'junior',
+      volumeDireto: '0,00',
+      niveis: [
+        { nivel: 2, vol: '0,00' },
+        { nivel: 3, vol: '0,00' },
+        { nivel: 4, vol: '0,00' },
+        { nivel: 5, vol: '0,00' },
+      ],
+    };
+
+    const CARGOS = {
+      junior: 0.07,
+      black: 0.09,
+    };
+
+    const NIVEIS_PCT = {
+      2: 0.03,
+      3: 0.02,
+      4: 0.02,
+      5: 0.015,
+    };
+
+    let cargoAtivo = 'junior';
+
+    const ger = {
+      cargos: document.querySelectorAll('[data-cargo]'),
+      volumeDireto: document.getElementById('volume-direto'),
+      comissaoDireta: document.getElementById('comissao-direta'),
+      totalDireta: document.getElementById('total-direta'),
+      totalIndireta: document.getElementById('total-indireta'),
+      totalGeral: document.getElementById('total-geral'),
+      niveis: [2, 3, 4, 5].map((n) => ({
+        nivel: n,
+        vol: document.querySelector('[data-vol="' + n + '"]'),
+        sub: document.querySelector('[data-sub="' + n + '"]'),
+      })),
+    };
+
+    function fmtUSD(v) {
+      return 'R$ ' + (Number(v) || 0).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    }
+
+    function parseInt0(str) {
+      const n = parseInt(String(str).replace(/\D/g, ''), 10);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function calcularGerencia() {
+      const volumeDireto = parseNumero(ger.volumeDireto.value);
+      const pctCargo = CARGOS[cargoAtivo];
+      const comDireta = volumeDireto * pctCargo;
+      ger.comissaoDireta.textContent = fmtUSD(comDireta);
+
+      let comIndireta = 0;
+      ger.niveis.forEach(({ nivel, vol, sub }) => {
+        const v = parseNumero(vol.value);
+        const subValor = v * NIVEIS_PCT[nivel];
+        sub.textContent = fmtUSD(subValor);
+        comIndireta += subValor;
+      });
+
+      ger.totalDireta.textContent = fmtUSD(comDireta);
+      ger.totalIndireta.textContent = fmtUSD(comIndireta);
+      ger.totalGeral.textContent = fmtUSD(comDireta + comIndireta);
+
+      salvarLocalGer();
+
+      if (typeof renderTabelaResidual === 'function' && document.getElementById('residual-tabela')) {
+        renderTabelaResidual();
+      }
+    }
+
+    function salvarLocalGer() {
+      try {
+        const dados = {
+          cargo: cargoAtivo,
+          volumeDireto: ger.volumeDireto.value,
+          niveis: ger.niveis.map(({ nivel, vol }) => ({
+            nivel,
+            vol: vol.value,
+          })),
+        };
+        localStorage.setItem(GER_STORAGE_KEY, JSON.stringify(dados));
+      } catch (_) {}
+    }
+
+    function carregarLocalGer() {
+      try {
+        const raw = localStorage.getItem(GER_STORAGE_KEY);
+        if (!raw) return;
+        aplicarGerDados(JSON.parse(raw));
+      } catch (_) {}
+    }
+
+    ger.cargos.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const novo = btn.dataset.cargo;
+        if (!CARGOS[novo]) return;
+        cargoAtivo = novo;
+        ger.cargos.forEach((b) => {
+          const ativo = b.dataset.cargo === cargoAtivo;
+          b.classList.toggle('active', ativo);
+          b.setAttribute('aria-checked', String(ativo));
+        });
+        calcularGerencia();
+      });
+    });
+
+    ger.volumeDireto.addEventListener('input', () => {
+      maskMoeda(ger.volumeDireto);
+      calcularGerencia();
+    });
+
+    ger.niveis.forEach(({ vol }) => {
+      vol.addEventListener('input', () => {
+        maskMoeda(vol);
+        calcularGerencia();
+      });
+    });
+
+    function aplicarGerDados(d) {
+      if (d.cargo && CARGOS[d.cargo] != null) {
+        cargoAtivo = d.cargo;
+        ger.cargos.forEach((b) => {
+          const ativo = b.dataset.cargo === cargoAtivo;
+          b.classList.toggle('active', ativo);
+          b.setAttribute('aria-checked', String(ativo));
+        });
+      }
+      if (d.volumeDireto != null) ger.volumeDireto.value = d.volumeDireto;
+      if (Array.isArray(d.niveis)) {
+        d.niveis.forEach((item) => {
+          const linha = ger.niveis.find((n) => n.nivel === item.nivel);
+          if (!linha) return;
+          if (item.vol != null) linha.vol.value = item.vol;
+        });
+      }
+    }
+
+    document.getElementById('btn-zerar-ger').addEventListener('click', () => {
+      aplicarGerDados(GER_ZEROS);
+      calcularGerencia();
+      toast('Valores zerados');
+    });
+
+    /* ─── Simulador de renda residual ─── */
+    const RES_STORAGE_KEY = 'jc-res-v3';
+
+    const RESIDUAL_PCTS = [1.60, 1.30, 1.10, 1.00, 1.00, 0.80, 0.70, 0.60, 0.50, 0.40];
+
+    let volumesManuais = { 6: 0, 7: 0, 8: 0, 9: 0, 10: 0 };
+
+    const res = {
+      residualAcumulado: document.getElementById('residual-acumulado'),
+      tabela: document.getElementById('residual-tabela'),
+    };
+
+    const ICON_CHECK =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+    function fmtBR(v) {
+      return 'R$ ' + (Number(v) || 0).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    }
+
+    function volumesDaGerencia() {
+      const out = {};
+      out[1] = parseNumero(ger.volumeDireto.value);
+      ger.niveis.forEach(({ nivel, vol }) => {
+        out[nivel] = parseNumero(vol.value);
+      });
+      return out;
+    }
+
+    function volumeDoNivel(nivel) {
+      if (nivel <= 5) {
+        return volumesDaGerencia()[nivel] || 0;
+      }
+      return Number(volumesManuais[nivel]) || 0;
+    }
+
+    function renderTabelaResidual() {
+      const volumesGer = volumesDaGerencia();
+
+      let html = '';
+      let total = 0;
+
+      RESIDUAL_PCTS.forEach((pct, idx) => {
+        const nivel = idx + 1;
+        const isManual = nivel >= 6;
+
+        const volume = isManual ? (Number(volumesManuais[nivel]) || 0) : (volumesGer[nivel] || 0);
+        const valor = volume * (pct / 100);
+        total += valor;
+
+        const numFmt = String(nivel).padStart(2, '0');
+        const pctFmt = pct.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+
+        let volCell;
+        if (isManual) {
+          const volStr = (Number(volumesManuais[nivel]) || 0).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+          volCell =
+            '<div class="input-wrap">' +
+              '<span class="input-prefix">R$</span>' +
+              '<input type="text" inputmode="decimal" data-vol-nivel="' + nivel + '" value="' + volStr + '" aria-label="Volume do nível ' + numFmt + '" />' +
+            '</div>';
+        } else {
+          volCell =
+            '<div class="tab-vol-auto">' +
+              '<span class="auto-num">R$ ' + volume.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</span>' +
+              '<span class="auto-tag">via gerência</span>' +
+            '</div>';
+        }
+
+        html += '<div class="tab-linha">' +
+          '<div class="tab-icone">' + ICON_CHECK + '</div>' +
+          '<div class="tab-nivel">Nível ' + numFmt + '</div>' +
+          '<div class="tab-pct">' + pctFmt + '</div>' +
+          volCell +
+          '<div class="tab-valor">' + fmtBR(valor) + '</div>' +
+          '</div>';
+      });
+
+      res.tabela.innerHTML = html;
+      res.residualAcumulado.textContent = fmtBR(total);
+
+      atualizarGeral();
+    }
+
+    function atualizarValoresLinhasManuais() {
+      let total = 0;
+      const linhas = res.tabela.querySelectorAll('.tab-linha');
+
+      RESIDUAL_PCTS.forEach((pct, idx) => {
+        const nivel = idx + 1;
+        const volume = volumeDoNivel(nivel);
+        const valor = volume * (pct / 100);
+        total += valor;
+
+        const linha = linhas[idx];
+        if (!linha) return;
+        const valorEl = linha.querySelector('.tab-valor');
+        if (valorEl) valorEl.textContent = fmtBR(valor);
+      });
+
+      res.residualAcumulado.textContent = fmtBR(total);
+      atualizarGeral();
+    }
+
+    function calcularResidual() {
+      renderTabelaResidual();
+      salvarLocalRes();
+    }
+
+    function salvarLocalRes() {
+      try {
+        localStorage.setItem(RES_STORAGE_KEY, JSON.stringify({ volumesManuais }));
+      } catch (_) {}
+    }
+
+    function carregarLocalRes() {
+      try {
+        const raw = localStorage.getItem(RES_STORAGE_KEY);
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        if (d.volumesManuais && typeof d.volumesManuais === 'object') {
+          [6, 7, 8, 9, 10].forEach((n) => {
+            if (d.volumesManuais[n] != null) volumesManuais[n] = Number(d.volumesManuais[n]) || 0;
+          });
+        }
+      } catch (_) {}
+    }
+
+    res.tabela.addEventListener('input', (e) => {
+      const t = e.target;
+      if (!t.matches('[data-vol-nivel]')) return;
+      const nivel = Number(t.dataset.volNivel);
+      maskMoeda(t);
+      volumesManuais[nivel] = parseNumero(t.value);
+      atualizarValoresLinhasManuais();
+      salvarLocalRes();
+    });
+
+
+    /* ─── Tabs principais ─── */
+    const tabBtns = document.querySelectorAll('.tab-btn:not(.tab-help)');
+    const tabSecs = document.querySelectorAll('.calc-tab');
+
+    function ativarTab(tabName) {
+      tabBtns.forEach((b) => b.classList.toggle('active', b.dataset.tab === tabName));
+      tabSecs.forEach((s) => s.classList.toggle('active', s.id === 'tab-' + tabName));
+      if (tabName === 'geral') atualizarGeral();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    tabBtns.forEach((btn) => {
+      btn.addEventListener('click', () => ativarTab(btn.dataset.tab));
+    });
+
+    /* ─── Modal Como Usar ─── */
+    const modal = document.getElementById('modal-como-usar');
+    document.getElementById('btn-como-usar').addEventListener('click', () => {
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    });
+    document.getElementById('modal-fechar').addEventListener('click', () => {
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    });
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('show')) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+
+    /* ─── Painel Geral ─── */
+    let chartComposicao = null;
+    let chartEvolucao = null;
+
+    function pegarValoresGeral() {
+      const r = calcular();
+
+      const volumeDireto = parseNumero(ger.volumeDireto.value);
+      const pctCargo = CARGOS[cargoAtivo];
+      const comDireta = volumeDireto * pctCargo;
+      let comIndireta = 0;
+      ger.niveis.forEach(({ nivel, vol }) => {
+        comIndireta += parseNumero(vol.value) * NIVEIS_PCT[nivel];
+      });
+      const gerencia = comDireta + comIndireta;
+
+      let residual = 0;
+      RESIDUAL_PCTS.forEach((pct, idx) => {
+        const nivel = idx + 1;
+        const volume = volumeDoNivel(nivel);
+        residual += volume * (pct / 100);
+      });
+
+      return {
+        juros: r.valorFinal,
+        jurosInicial: r.valorInicial,
+        jurosLinhas: r.linhas,
+        meses: r.tempoMeses,
+        gerencia,
+        residual,
+      };
+    }
+
+    function atualizarGeral() {
+      const elTotal = document.getElementById('geral-total');
+      if (!elTotal) return;
+
+      const v = pegarValoresGeral();
+      const rendaMensal = v.gerencia + v.residual;
+      const rendaAcum = rendaMensal * v.meses;
+      const totalGeral = v.juros + rendaAcum;
+
+      document.getElementById('geral-juros').textContent = fmtBR(v.juros);
+      document.getElementById('geral-gerencia').textContent = fmtBR(v.gerencia);
+      document.getElementById('geral-residual').textContent = fmtBR(v.residual);
+      elTotal.textContent = fmtBR(totalGeral);
+      document.getElementById('geral-total-sub').textContent =
+        fmtBR(v.juros) + ' (juros) + ' + fmtBR(rendaMensal) + '/mês × ' + v.meses + ' meses';
+
+      const tabGeral = document.getElementById('tab-geral');
+      if (!tabGeral || !tabGeral.classList.contains('active')) return;
+
+      renderChartComposicao(v.juros, v.gerencia * v.meses, v.residual * v.meses);
+      renderChartEvolucao(v);
+    }
+
+    function renderChartComposicao(juros, gerTotal, resTotal) {
+      const canvas = document.getElementById('chart-composicao');
+      if (!canvas) return;
+
+      const data = {
+        labels: ['Planos de investimento', 'Gerência (período)', 'Residual (período)'],
+        datasets: [{
+          data: [juros, gerTotal, resTotal],
+          backgroundColor: ['#4F46E5', '#10B981', '#FACC15'],
+          borderWidth: 2,
+          borderColor: '#FFFFFF',
+        }],
+      };
+
+      if (chartComposicao) {
+        chartComposicao.data = data;
+        chartComposicao.update('none');
+        return;
+      }
+
+      const ctx = canvas.getContext('2d');
+      chartComposicao = new Chart(ctx, {
+        type: 'doughnut',
+        data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '58%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { padding: 12, font: { size: 11.5, family: 'Inter' }, boxWidth: 10, boxHeight: 10, usePointStyle: true },
+            },
+            tooltip: {
+              backgroundColor: '#1A1A2E',
+              padding: 10,
+              cornerRadius: 6,
+              titleFont: { size: 12, weight: '600', family: 'Inter' },
+              bodyFont: { size: 12.5, family: 'Inter' },
+              callbacks: { label: (c) => ' ' + c.label + ': ' + fmtBR(c.parsed) },
+            },
+          },
+        },
+      });
+    }
+
+    function renderChartEvolucao(v) {
+      const canvas = document.getElementById('chart-evolucao');
+      if (!canvas) return;
+
+      const labels = ['0'];
+      const dataJuros = [v.jurosInicial];
+      const dataRenda = [0];
+      const dataTotal = [v.jurosInicial];
+      const rendaMensal = v.gerencia + v.residual;
+
+      v.jurosLinhas.forEach((l) => {
+        labels.push(String(l.mes));
+        dataJuros.push(l.saldo);
+        const rendaAcum = rendaMensal * l.mes;
+        dataRenda.push(rendaAcum);
+        dataTotal.push(l.saldo + rendaAcum);
+      });
+
+      const data = {
+        labels,
+        datasets: [
+          {
+            label: 'Total',
+            data: dataTotal,
+            borderColor: '#4F46E5',
+            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+            borderWidth: 2.5,
+            fill: true,
+            tension: 0.25,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+          },
+          {
+            label: 'Planos',
+            data: dataJuros,
+            borderColor: '#10B981',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            fill: false,
+            tension: 0.25,
+            pointRadius: 0,
+          },
+          {
+            label: 'Renda acum.',
+            data: dataRenda,
+            borderColor: '#FACC15',
+            borderWidth: 2,
+            borderDash: [3, 4],
+            fill: false,
+            tension: 0,
+            pointRadius: 0,
+          },
+        ],
+      };
+
+      if (chartEvolucao) {
+        chartEvolucao.data = data;
+        chartEvolucao.update('none');
+        return;
+      }
+
+      const ctx = canvas.getContext('2d');
+      chartEvolucao = new Chart(ctx, {
+        type: 'line',
+        data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { padding: 10, font: { size: 11, family: 'Inter' }, boxWidth: 12, boxHeight: 12, usePointStyle: true },
+            },
+            tooltip: {
+              backgroundColor: '#1A1A2E',
+              padding: 10,
+              cornerRadius: 6,
+              titleFont: { size: 12, weight: '600', family: 'Inter' },
+              bodyFont: { size: 12.5, family: 'Inter' },
+              callbacks: {
+                title: (items) => 'Mês ' + items[0].label,
+                label: (c) => c.dataset.label + ': ' + fmtBR(c.parsed.y),
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#9CA3AF', font: { size: 10.5, family: 'Inter' }, maxRotation: 0, autoSkipPadding: 16 },
+            },
+            y: {
+              grid: { color: '#F3F4F6' },
+              ticks: {
+                color: '#9CA3AF',
+                font: { size: 10.5, family: 'Inter' },
+                callback: (val) => {
+                  if (val >= 1000000) return 'R$ ' + (val / 1000000).toFixed(1) + 'M';
+                  if (val >= 1000) return 'R$ ' + (val / 1000).toFixed(0) + 'k';
+                  return 'R$ ' + val;
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+
+    /* ─── Múltiplos planos de investimento ─── */
+    let nextPlanoExtraId = 2;
+    const planosExtras = [];
+
+    const extrasEls = {
+      container: document.getElementById('planos-extras'),
+      btnAdd: document.getElementById('btn-add-plano'),
+      somatorio: document.getElementById('planos-somatorio'),
+      somaInvestido: document.getElementById('soma-investido'),
+      somaJuros: document.getElementById('soma-juros'),
+      somaFinal: document.getElementById('soma-final'),
+    };
+
+    function calcularComParams(params) {
+      const taxaMensal = PLANOS[params.plano];
+      const aporte = params.aporteAtivo ? params.aporte : 0;
+      const tempoMeses = params.tempoUnidade === 'anos'
+        ? Math.round(params.tempo * 12)
+        : Math.round(params.tempo);
+
+      let saldo = params.valorInicial;
+      for (let mes = 1; mes <= tempoMeses; mes++) {
+        saldo = saldo + saldo * taxaMensal + aporte;
+      }
+
+      const totalInvestido = params.valorInicial + aporte * tempoMeses;
+      const totalJuros = saldo - totalInvestido;
+      return { valorFinal: saldo, totalInvestido, totalJuros };
+    }
+
+    function planosDisponiveis(excluirId) {
+      const usados = [planoAtivo];
+      planosExtras.forEach((p) => {
+        if (p.id !== excluirId) usados.push(p.plano);
+      });
+      return ['iniciante', 'intermediario', 'avancado'].filter((p) => !usados.includes(p));
+    }
+
+    function formatNumBR(n) {
+      return Number(n || 0).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    }
+
+    const PLANO_INFO = {
+      iniciante: { nome: 'Iniciante', taxa: '27%' },
+      intermediario: { nome: 'Intermediário', taxa: '30%' },
+      avancado: { nome: 'Avançado', taxa: '33%' },
+    };
+
+    function gerarHtmlPlanoExtra(extra) {
+      const disp = planosDisponiveis(extra.id);
+      const isLocked = (p) => p !== extra.plano && !disp.includes(p);
+
+      const btnsPlanos = ['iniciante', 'intermediario', 'avancado'].map((key) => {
+        const info = PLANO_INFO[key];
+        const ativo = extra.plano === key;
+        const lock = isLocked(key);
+        return (
+          '<button type="button" class="plano' + (ativo ? ' active' : '') + '" ' +
+          'data-plano-extra="' + key + '"' + (lock ? ' disabled' : '') + '>' +
+          '<span class="plano-nome">' + info.nome + '</span>' +
+          '<span class="plano-taxa">' + info.taxa + '</span>' +
+          '<span class="plano-period">ao mês</span>' +
+          '</button>'
+        );
+      }).join('');
+
+      return (
+        '<div class="plano-extra" data-id="' + extra.id + '">' +
+          '<div class="plano-extra-header">' +
+            '<h3>Plano adicional</h3>' +
+            '<button type="button" class="btn-remover-plano" data-remover="' + extra.id + '" aria-label="Remover plano">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+                '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>' +
+              '</svg>' +
+            '</button>' +
+          '</div>' +
+          '<div class="field">' +
+            '<label>Plano de investimento</label>' +
+            '<div class="planos">' + btnsPlanos + '</div>' +
+          '</div>' +
+          '<div class="plano-extra-grid">' +
+            '<div>' +
+              '<div class="field-toggle">' +
+                '<label class="switch" for="toggle-extra-' + extra.id + '">' +
+                  '<input type="checkbox" id="toggle-extra-' + extra.id + '"' + (extra.aporteAtivo ? ' checked' : '') + ' data-toggle-extra="' + extra.id + '" />' +
+                  '<span class="slider"></span>' +
+                '</label>' +
+                '<label class="switch-label" for="toggle-extra-' + extra.id + '">Fazer aporte mensal</label>' +
+              '</div>' +
+              '<div class="field' + (extra.aporteAtivo ? '' : ' hidden') + '" data-aporte-field="' + extra.id + '">' +
+                '<label>Aporte mensal</label>' +
+                '<div class="input-wrap">' +
+                  '<span class="input-prefix">R$</span>' +
+                  '<input type="text" inputmode="decimal" data-aporte-extra="' + extra.id + '" value="' + formatNumBR(extra.aporte) + '" />' +
+                '</div>' +
+              '</div>' +
+              '<div class="field">' +
+                '<label>Valor inicial</label>' +
+                '<div class="input-wrap">' +
+                  '<span class="input-prefix">R$</span>' +
+                  '<input type="text" inputmode="decimal" data-vi-extra="' + extra.id + '" value="' + formatNumBR(extra.valorInicial) + '" />' +
+                '</div>' +
+              '</div>' +
+              '<div class="field">' +
+                '<label>Período</label>' +
+                '<div class="input-wrap">' +
+                  '<input type="text" inputmode="numeric" data-tempo-extra="' + extra.id + '" value="' + extra.tempo + '" />' +
+                  '<select data-tempo-un-extra="' + extra.id + '">' +
+                    '<option value="meses"' + (extra.tempoUnidade === 'meses' ? ' selected' : '') + '>meses</option>' +
+                    '<option value="anos"' + (extra.tempoUnidade === 'anos' ? ' selected' : '') + '>anos</option>' +
+                  '</select>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="plano-extra-result">' +
+              '<span class="res-label">Valor final</span>' +
+              '<span class="res-final" data-rfinal="' + extra.id + '">R$ 0,00</span>' +
+              '<div class="res-line"><span>Total investido</span><strong data-rinv="' + extra.id + '">R$ 0,00</strong></div>' +
+              '<div class="res-line"><span>Total em juros</span><strong data-rjuros="' + extra.id + '">R$ 0,00</strong></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }
+
+    function renderPlanosExtras() {
+      extrasEls.container.innerHTML = planosExtras.map(gerarHtmlPlanoExtra).join('');
+      atualizarBotaoAdd();
+      atualizarBotoesPlanoPrincipal();
+    }
+
+    function atualizarBotaoAdd() {
+      const disp = planosDisponiveis();
+      extrasEls.btnAdd.disabled = disp.length === 0;
+    }
+
+    function atualizarBotoesPlanoPrincipal() {
+      // Desabilita botões da calc principal que já são usados nos extras
+      const usadosExtras = planosExtras.map((p) => p.plano);
+      els.planos.forEach((btn) => {
+        const key = btn.dataset.plano;
+        if (key === planoAtivo) return;
+        btn.disabled = usadosExtras.includes(key);
+      });
+    }
+
+    function adicionarPlanoExtra() {
+      const disp = planosDisponiveis();
+      if (disp.length === 0) return;
+      const id = nextPlanoExtraId++;
+      planosExtras.push({
+        id,
+        plano: disp[0],
+        valorInicial: 1000,
+        aporte: 300,
+        aporteAtivo: true,
+        tempo: 6,
+        tempoUnidade: 'meses',
+      });
+      renderPlanosExtras();
+      recalcularSomatorio();
+    }
+
+    function removerPlanoExtra(id) {
+      const idx = planosExtras.findIndex((p) => p.id === id);
+      if (idx === -1) return;
+      planosExtras.splice(idx, 1);
+      renderPlanosExtras();
+      recalcularSomatorio();
+    }
+
+    function recalcularSomatorio() {
+      const r1 = calcular();
+      let somaFinal = r1.valorFinal;
+      let somaInvestido = r1.totalInvestido;
+      let somaJuros = r1.totalJuros;
+
+      planosExtras.forEach((p) => {
+        const r = calcularComParams(p);
+        somaFinal += r.valorFinal;
+        somaInvestido += r.totalInvestido;
+        somaJuros += r.totalJuros;
+
+        const elFinal = document.querySelector('[data-rfinal="' + p.id + '"]');
+        const elInv = document.querySelector('[data-rinv="' + p.id + '"]');
+        const elJur = document.querySelector('[data-rjuros="' + p.id + '"]');
+        if (elFinal) elFinal.textContent = fmtBR(r.valorFinal);
+        if (elInv) elInv.textContent = fmtBR(r.totalInvestido);
+        if (elJur) elJur.textContent = fmtBR(r.totalJuros);
+      });
+
+      extrasEls.somatorio.hidden = planosExtras.length === 0;
+      extrasEls.somaInvestido.textContent = fmtBR(somaInvestido);
+      extrasEls.somaJuros.textContent = fmtBR(somaJuros);
+      extrasEls.somaFinal.textContent = fmtBR(somaFinal);
+    }
+
+    extrasEls.btnAdd.addEventListener('click', adicionarPlanoExtra);
+
+    extrasEls.container.addEventListener('click', (e) => {
+      const rem = e.target.closest('[data-remover]');
+      if (rem) {
+        removerPlanoExtra(Number(rem.dataset.remover));
+        return;
+      }
+      const planoBtn = e.target.closest('[data-plano-extra]');
+      if (planoBtn && !planoBtn.disabled) {
+        const wrap = planoBtn.closest('[data-id]');
+        const id = Number(wrap.dataset.id);
+        const novo = planoBtn.dataset.planoExtra;
+        const extra = planosExtras.find((p) => p.id === id);
+        if (!extra) return;
+        const disp = planosDisponiveis(id);
+        if (novo !== extra.plano && !disp.includes(novo)) return;
+        extra.plano = novo;
+        renderPlanosExtras();
+        recalcularSomatorio();
+      }
+    });
+
+    extrasEls.container.addEventListener('input', (e) => {
+      const t = e.target;
+      const wrap = t.closest('[data-id]');
+      if (!wrap) return;
+      const id = Number(wrap.dataset.id);
+      const extra = planosExtras.find((p) => p.id === id);
+      if (!extra) return;
+
+      if (t.dataset.viExtra) {
+        maskMoeda(t);
+        extra.valorInicial = parseNumero(t.value);
+      } else if (t.dataset.aporteExtra) {
+        maskMoeda(t);
+        extra.aporte = parseNumero(t.value);
+      } else if (t.dataset.tempoExtra) {
+        t.value = t.value.replace(/\D/g, '');
+        extra.tempo = parseInt(t.value, 10) || 0;
+      }
+      recalcularSomatorio();
+    });
+
+    extrasEls.container.addEventListener('change', (e) => {
+      const t = e.target;
+      const wrap = t.closest('[data-id]');
+      if (!wrap) return;
+      const id = Number(wrap.dataset.id);
+      const extra = planosExtras.find((p) => p.id === id);
+      if (!extra) return;
+
+      if (t.dataset.toggleExtra) {
+        extra.aporteAtivo = t.checked;
+        const f = document.querySelector('[data-aporte-field="' + id + '"]');
+        if (f) f.classList.toggle('hidden', !extra.aporteAtivo);
+        recalcularSomatorio();
+      } else if (t.dataset.tempoUnExtra) {
+        extra.tempoUnidade = t.value;
+        recalcularSomatorio();
+      }
+    });
+
+    /* Init */
+    carregarLocal();
+    carregarLocalGer();
+    carregarLocalRes();
+    atualizar();
+    calcularGerencia();
+    calcularResidual();
+    atualizarBotaoAdd();
+  </script>
+</body>
+</html>
