@@ -2574,10 +2574,11 @@
           <h3><span class="step-num">1</span> Planos de Investimento</h3>
           <ul>
             <li>Escolha seu plano: <strong>Iniciante (27%)</strong>, <strong>Intermediário (30%)</strong> ou <strong>Avançado (33%)</strong> ao mês</li>
+            <li><strong>Reinvestimento a cada 15 dias</strong> — o lucro é incorporado 2x por mês (composição quinzenal), seguindo o ciclo da plataforma</li>
             <li>Informe o valor inicial investido</li>
             <li>Liga ou desliga o <strong>aporte mensal</strong> (opcional)</li>
-            <li>Defina o período em meses ou anos</li>
-            <li>Veja gráfico e tabela mês a mês com a evolução</li>
+            <li>Defina o período em meses ou anos — a exibição da tabela e gráfico continua mês a mês</li>
+            <li>Pode adicionar mais planos com o botão <strong>"+ Adicionar outro plano"</strong> e ver o somatório</li>
             <li>Pode salvar a simulação como arquivo pra reabrir depois</li>
           </ul>
         </div>
@@ -2708,14 +2709,23 @@
 
       const tempoMeses = tempoUnidade === 'anos' ? Math.round(tempo * 12) : Math.round(tempo);
       const taxaMensal = PLANOS[planoAtivo];
+      const taxaQuinzenal = taxaMensal / 2;
 
       let saldo = valorInicial;
       const linhas = [];
       let totalJurosAcum = 0;
 
       for (let mes = 1; mes <= tempoMeses; mes++) {
-        const jurosMes = saldo * taxaMensal;
-        saldo = saldo + jurosMes + aporte;
+        // 1ª quinzena (reinvestimento dia 15)
+        const juros1 = saldo * taxaQuinzenal;
+        saldo += juros1;
+        // 2ª quinzena (reinvestimento fim do mês)
+        const juros2 = saldo * taxaQuinzenal;
+        saldo += juros2;
+        // Aporte mensal entra no fim do mês
+        saldo += aporte;
+
+        const jurosMes = juros1 + juros2;
         totalJurosAcum += jurosMes;
         linhas.push({
           mes,
@@ -3606,6 +3616,7 @@
 
     function calcularComParams(params) {
       const taxaMensal = PLANOS[params.plano];
+      const taxaQuinzenal = taxaMensal / 2;
       const aporte = params.aporteAtivo ? params.aporte : 0;
       const tempoMeses = params.tempoUnidade === 'anos'
         ? Math.round(params.tempo * 12)
@@ -3613,7 +3624,9 @@
 
       let saldo = params.valorInicial;
       for (let mes = 1; mes <= tempoMeses; mes++) {
-        saldo = saldo + saldo * taxaMensal + aporte;
+        saldo += saldo * taxaQuinzenal; // 1ª quinzena
+        saldo += saldo * taxaQuinzenal; // 2ª quinzena
+        saldo += aporte;
       }
 
       const totalInvestido = params.valorInicial + aporte * tempoMeses;
